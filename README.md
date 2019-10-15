@@ -1,6 +1,6 @@
 # COMP472-Project1
 
-## Team #14 Information:
+## Team Information:
 
 
 | Name | ID | Email | Github |
