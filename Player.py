@@ -42,8 +42,8 @@ class Player(object):
         self.visitedCoordinates.append(coordinates)
 
     def removeTokenCoordinates(self, token):
-        coordinates = Coordinates(token.coordinates.x, token.coordinates.y)
-        self.visitedCoordinates.remove(token)
+        coordinates = token.coordinates
+        self.visitedCoordinates.remove(coordinates)
 
     def addTokenToList(self, token):
         self.tokenList.append(token)

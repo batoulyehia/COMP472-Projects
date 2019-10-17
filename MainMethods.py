@@ -77,7 +77,7 @@ def move(player, shape, newToken, oldToken):
     print(oldCoordinates.x)
     print(oldCoordinates.y)
 
-    # player.removeTokenCoordinates(oldCoordinates)
+    player.removeTokenCoordinates(oldCoordinates)
     player.removeFromTokenList(oldToken)
 
     player.placeToken(newToken)
