@@ -92,7 +92,7 @@ def evaluateMove(token, userInput, player, board):
         print(x)
         print(y)
 
-        if (isTheCellOccupied(board, x, y)) or (x < 0) or (x > 9) or (y < 0) or (y > 11):
+        if (x < 0) or (x > 9) or (y < 0) or (y > 11):
             print("Space is occupied. Please select another move.")
             userInput = input(
                 "\n%s, Which way do you want to move?\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT"
