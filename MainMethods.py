@@ -2,6 +2,29 @@ from Player import *
 import string
 
 
+# Get token coordinates from user input
+def getTokenCoordinates(board, playerName):
+    while True:
+        try:
+            stringCoordinate = input(
+                "\n%s, Please enter your coordinate and place your token (EX : A2)\n" % playerName)
+            # Parse string to numbers
+            numberCoordinate = Methods.toRealCoordinates(stringCoordinate)
+            # Get coordinate x and y
+            x = numberCoordinate.x
+            y = numberCoordinate.y
+            # Check if the cell occupied
+            if isTheCellOccupied(board, x, y):
+                print("The cell is already occupied, please enter another coordinates")
+            else:
+                return x, y
+                break
+        except Exception as e:
+            print(
+                "illegal input, you have to enter the alphabetic part (A to L) and numerical part (1 to 10) in "
+                "order\nTry again")
+
+
 # Print current board
 def printBoard(board):
     tempNumber = 10
@@ -120,11 +143,14 @@ def startTwoPlayerGame():
     board = [['_' for i in range(12)] for j in range(10)]
     print("Let's start two player game model\n")
 
+    # Player1 setting
     player1Name = input("Player1\nPlease enter your name:\n")
     while not player1Name:
         player1Name = input("Invalid entry\nPlayer1\nPlease enter your name:\n")
     # Player1 default setting is X
     player1 = Player(player1Name, "X")
+
+    # Player2 setting
     player2Name = input("Player2\nPlease enter your name:\n")
     while not player2Name:
         player2Name = input("Invalid entry\nPlayer2\nPlease enter your name:\n")
@@ -142,225 +168,193 @@ def startTwoPlayerGame():
     x = 0
     y = 0
     while totalCounter > 0:
-        print("\nRound " + str(currentCounter + 1))
+        print("\nRound " + str(currentCounter + 1))  # Print the current round
+
         # Player1 start to play
         player1Choice = ""
-        if currentCounter == 0:
-            player1Choice = "PLACE"
+        if currentCounter == 0:  # if it is first round, the default select is place
+            player1Choice = "P"
         else:
-            player1Choice = input(
-                "\n%s, Please select what you want to do: \nMOVE\nPLACE"
-            )
+            while True:  # this while loop is for determine the inputs valid or not
+                player1Choice = input(
+                    "\n%s, Please select what you want to do:\nMOVE(M) OR PLACE(P)\n" % player1Name
+                )
+                print(player1Choice)
+                if player1Choice == "M" or player1Choice == "P":
+                    break
+                else:
+                    print("illegal input, you have to enter the M or P")
 
-        while player1Choice != "PLACE" or player1Choice != "MOVE":
-            # CASE PLACE TOKEN
-            if player1Choice == "PLACE":
-                while True:
-                    try:
-                        stringCoordinate = input(
-                            "\n%s, Please enter your coordinate and place your token (EX : A2)\n" % player1Name)
-                        # Parse string to numbers
-                        numberCoordinate = Methods.toRealCoordinates(stringCoordinate)
-                        # Get coordinate x and y
-                        x = numberCoordinate.x
-                        y = numberCoordinate.y
-                        # Check if the cell occupied
-                        if isTheCellOccupied(board, x, y):
-                            print("The cell is already occupied, please enter another coordinates")
-                        else:
-                            break
-                    except Exception as e:
+        # CASE PLACE TOKEN
+        if player1Choice == "P":
+            x, y = getTokenCoordinates(board, player1Name)
+            print("Here")
+            # Create token
+            token = Token(player1Name, player1.shape, x, y)
+            # Place token and add to visited token list
+            player1.placeToken(token)
+            player1.addTokenToList(token)
+            addToBoard(board, x, y, token.shape)
+            print("Done1")
+
+
+        # CASE MOVE TOKEN
+        elif player1Choice == "M":
+            while True:
+                try:
+                    stringInputCoordinate = input(
+                        "\n%s, Please enter the coordinate of one of your placed tokens (EX: A2)\n" % player1Name)
+                    # Parse string to numbers
+                    convertedInputCoordinate = Methods.toRealCoordinates(stringInputCoordinate)
+                    x = convertedInputCoordinate.x
+                    y = convertedInputCoordinate.y
+                    # check if the cell is not occupied and that the token doesn't belong to the other player
+                    if (not isTheCellOccupied(board, x, y)) or (board[x][y] == player2.shape):
+                        print("Please enter a valid token (one of your tokens)")
+
+                    elif (isTheCellOccupied(board, x - 1, y + 1)) and (isTheCellOccupied(board, x, y + 1)) and (
+                            isTheCellOccupied(board, x + 1, y + 1)) and (isTheCellOccupied(board, x - 1, y)) and (
+                            isTheCellOccupied(board, x + 1, y)) and (isTheCellOccupied(board, x - 1, y - 1)) and (
+                            isTheCellOccupied(board, x, y - 1)) and (isTheCellOccupied(board, x + 1, y - 1)):
                         print(
-                            "illegal input, you have to enter the alphabetic part (A to L) and numerical part (1 to 10) in "
-                            "order\nTry again")
-                # Create token
-                token = Token(player1Name, player1.shape, x, y)
-                # Place token and add to visited token list
-                player1.placeToken(token)
-                player1.addTokenToList(token)
-                addToBoard(board, x, y, token.shape)
-                break
-
-            # CASE MOVE TOKEN
-            elif player1Choice == "MOVE":
-                while True:
-                    try:
-                        stringInputCoordinate = input(
-                            "\n%s, Please enter the coordinate of one of your placed tokens (EX: A2)\n" % player1Name)
-                        # Parse string to numbers
-                        convertedInputCoordinate = Methods.toRealCoordinates(stringInputCoordinate)
-                        x = convertedInputCoordinate.x
-                        y = convertedInputCoordinate.y
-                        # check if the cell is not occupied and that the token doesn't belong to the other player
-                        if (not isTheCellOccupied(board, x, y)) or (board[x][y] == player2.shape):
-                            print("Please enter a valid token (one of your tokens)")
-
-                        elif (isTheCellOccupied(board, x - 1, y + 1)) and (isTheCellOccupied(board, x, y + 1)) and (
-                        isTheCellOccupied(board, x + 1, y + 1)) and (isTheCellOccupied(board, x - 1, y)) and (
-                        isTheCellOccupied(board, x + 1, y)) and (isTheCellOccupied(board, x - 1, y - 1)) and (
-                        isTheCellOccupied(board, x, y - 1)) and (isTheCellOccupied(board, x + 1, y - 1)):
-                            print(
-                                "Please choose a token that isn't surrounded by other tokens so that you may properly move it.")
-                        else:
-                            break
-                    except Exception as e:
-                        print(
-                            "Illegal input, you have to enter the alphabetic part (A to L) and numerical part (1 to 10 in )"
-                            "order\nTry again.")
-
-                selectedToken = Token(player1Name, player1.shape, x, y)
-                while True:
-                    # try:
-                    direction = input(
-                        "\n%s, Which way do you want to move?\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT"
-                    )
-                    print(direction)
-                    # Evaluates the move selected and checks its validity (if the cell is empty, or if it goes out of the board)
-                    attemptMove = evaluateMove(selectedToken, direction, player1, board)
-                    isValidMove = checkValidity(attemptMove, board)
-                    if isValidMove:
-                        print("Move valid, moving token" + direction)
-                        # selectedToken = attemptMove
-                        break
+                            "Please choose a token that isn't surrounded by other tokens so that you may properly move it.")
                     else:
-                        print("Please select another move.")
-                # except Exception as e:
-                #     print("Illegal input, please enter one of the following:\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT")
-                #
-                # TODO: Add the coordinates and token inside the list.
-                move(player1, player1.shape, attemptMove, selectedToken)
-                removeFromBoard(board, selectedToken.coordinates.x, selectedToken.coordinates.y)
-                addToBoard(board, attemptMove.coordinates.x, attemptMove.coordinates.y, player1.shape)
-                break
+                        break
+                except Exception as e:
+                    print(
+                        "Illegal input, you have to enter the alphabetic part (A to L) and numerical part (1 to 10 in )"
+                        "order\nTry again.")
 
-            else:
-                print("Please select either MOVE or PLACE")
+            selectedToken = Token(player1Name, player1.shape, x, y)
+            while True:
+                # try:
+                direction = input(
+                    "\n%s, Which way do you want to move?\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT"
+                )
+                print(direction)
+                # Evaluates the move selected and checks its validity (if the cell is empty, or if it goes out of the board)
+                attemptMove = evaluateMove(selectedToken, direction, player1, board)
+                isValidMove = checkValidity(attemptMove, board)
+                if isValidMove:
+                    print("Move valid, moving token" + direction)
+                    # selectedToken = attemptMove
+                    break
+                else:
+                    print("Please select another move.")
+            # except Exception as e:
+            #     print("Illegal input, please enter one of the following:\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT")
+            #
+            # TODO: Add the coordinates and token inside the list.
+            move(player1, player1.shape, attemptMove, selectedToken)
+            removeFromBoard(board, selectedToken.coordinates.x, selectedToken.coordinates.y)
+            addToBoard(board, attemptMove.coordinates.x, attemptMove.coordinates.y, player1.shape)
 
-                # Player1 finish his turn
+        # Player1 finish his turn
         printBoard(board)
 
         # Check player1 win or not
-        if currentCounter >= 4:
+        if currentCounter >= 4:  # The 5th rounds
             if Methods.doIWin(player1, player2):
                 print("\n%s, Congratulations!!! You win the game.\n" % player1Name)
                 exit(0)
 
-        player1Choice = ""
+        # Print my tokenList
         for i in player1.tokenList:
-            print(i.owner)
-            print(i.shape)
-            print(i.coordinates.x)
+            print(i.owner + ", You have placed token at X: " + str(i.coordinates.x) + " Y: " + str(
+                i.coordinates.y) + "\n")
 
-        ###########================================########################
+        ###########==================Player2==============########################
         # Player2 start to play
         player2Choice = ""
         if currentCounter == 0:
-            player2Choice = "PLACE"
+            player2Choice = "P"
         else:
-            player2Choice = input(
-                "\n%s, Please select what you want to do: \nMOVE\nPLACE"
-            )
+            while True:  # this while loop is for determine the inputs valid or not
+                player2Choice = input(
+                    "\n%s, Please select what you want to do: \nMOVE(M) OR PLACE(P)\n" % player2Name
+                )
+                if player2Choice == "M" or player2Choice == "P":
+                    break
+                else:
+                    print("illegal input, you have to enter the M or P")
 
-        while player2Choice != "PLACE" or player2Choice != "MOVE":
-            # CASE PLACE TOKEN
-            if player2Choice == "PLACE":
-                while True:
-                    try:
-                        stringCoordinate = input(
-                            "\n%s, Please enter your coordinate and place your token (EX : A2)\n" % player2Name)
-                        # Parse string to numbers
-                        numberCoordinate = Methods.toRealCoordinates(stringCoordinate)
-                        # Get coordinate x and y
-                        x = numberCoordinate.x
-                        y = numberCoordinate.y
-                        # Check if the cell occupied
-                        if isTheCellOccupied(board, x, y):
-                            print("The cell is already occupied, please enter another coordinates")
-                        else:
-                            break
-                    except Exception as e:
+        # CASE PLACE TOKEN
+        if player2Choice == "P":
+            x, y = getTokenCoordinates(board, player2Name)
+            # Create token
+            token = Token(player2Name, player2.shape, x, y)
+            # Place token and add to visited token list
+            player2.placeToken(token)
+            player2.addTokenToList(token)
+            addToBoard(board, x, y, token.shape)
+
+        # CASE MOVE TOKEN
+        elif player2Choice == "M":
+            while True:
+                try:
+                    stringInputCoordinate = input(
+                        "\n%s, Please enter the coordinate of one of your placed tokens (EX: A2)\n" % player2Name)
+                    # Parse string to numbers
+                    convertedInputCoordinate = Methods.toRealCoordinates(stringInputCoordinate)
+                    x = convertedInputCoordinate.x
+                    y = convertedInputCoordinate.y
+                    # check if the cell is not occupied and that the token doesn't belong to the other player
+                    if (not isTheCellOccupied(board, x, y)) or (board[x][y] == player1.shape):
+                        print("Please enter a valid token (one of your tokens)")
+
+                    elif (isTheCellOccupied(board, x - 1, y + 1)) and (isTheCellOccupied(board, x, y + 1)) and (
+                            isTheCellOccupied(board, x + 1, y + 1)) and (isTheCellOccupied(board, x - 1, y)) and (
+                            isTheCellOccupied(board, x + 1, y)) and (isTheCellOccupied(board, x - 1, y - 1)) and (
+                            isTheCellOccupied(board, x, y - 1)) and (isTheCellOccupied(board, x + 1, y - 1)):
                         print(
-                            "illegal input, you have to enter the alphabetic part (A to L) and numerical part (1 to 10) in "
-                            "order\nTry again")
-                # Create token
-                token = Token(player2Name, player2.shape, x, y)
-                # Place token and add to visited token list
-                player2.placeToken(token)
-                player2.addTokenToList(token)
-                addToBoard(board, x, y, token.shape)
-                break
+                            "Please choose a token that isn't surrounded by other tokens so that you may properly move it.")
+                    else:
+                        break
+                except Exception as e:
+                    print(
+                        "Illegal input, you have to enter the alphabetic part (A to L) and numerical part (1 to 10 in )"
+                        "order\nTry again.")
 
-            # CASE MOVE TOKEN
-            elif player2Choice == "MOVE":
-                while True:
-                    try:
-                        stringInputCoordinate = input(
-                            "\n%s, Please enter the coordinate of one of your placed tokens (EX: A2)\n" % player2Name)
-                        # Parse string to numbers
-                        convertedInputCoordinate = Methods.toRealCoordinates(stringInputCoordinate)
-                        x = convertedInputCoordinate.x
-                        y = convertedInputCoordinate.y
-                        # check if the cell is not occupied and that the token doesn't belong to the other player
-                        if (not isTheCellOccupied(board, x, y)) or (board[x][y] == player1.shape):
-                            print("Please enter a valid token (one of your tokens)")
+            selectedToken = Token(player2Name, player2.shape, x, y)
+            while True:
+                try:
+                    direction = input(
+                        "\n%s, Which way do you want to move?\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT"
+                    )
+                    # Evaluates the move selected and checks its validity (if the cell is empty, or if it goes out of the board)
+                    attemptMove = evaluateMove(selectedToken, direction, player2, board)
+                    isValidMove = checkValidity(attemptMove, board)
+                    if isValidMove:
+                        print("Move valid, moving token" + direction)
+                        break
+                    else:
+                        print("Please select another move.")
+                except Exception as e:
+                    print(
+                        "Illegal input, please enter one of the following:\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT")
 
-                        elif (isTheCellOccupied(board, x - 1, y + 1)) and (isTheCellOccupied(board, x, y + 1)) and (
-                        isTheCellOccupied(board, x + 1, y + 1)) and (isTheCellOccupied(board, x - 1, y)) and (
-                        isTheCellOccupied(board, x + 1, y)) and (isTheCellOccupied(board, x - 1, y - 1)) and (
-                        isTheCellOccupied(board, x, y - 1)) and (isTheCellOccupied(board, x + 1, y - 1)):
-                            print(
-                                "Please choose a token that isn't surrounded by other tokens so that you may properly move it.")
-                        else:
-                            break
-                    except Exception as e:
-                        print(
-                            "Illegal input, you have to enter the alphabetic part (A to L) and numerical part (1 to 10 in )"
-                            "order\nTry again.")
+            # TODO: Add the coordinates and token inside the list.
+            move(player2, player2.shape, attemptMove, selectedToken)
+            removeFromBoard(board, selectedToken.coordinates.x, selectedToken.coordinates.y)
+            addToBoard(board, attemptMove.coordinates.x, attemptMove.coordinates.y, player2.shape)
 
-                selectedToken = Token(player2Name, player2.shape, x, y)
-                while True:
-                    try:
-                        direction = input(
-                            "\n%s, Which way do you want to move?\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT"
-                        )
-                        # Evaluates the move selected and checks its validity (if the cell is empty, or if it goes out of the board)
-                        attemptMove = evaluateMove(selectedToken, direction, player2,board)
-                        isValidMove = checkValidity(attemptMove, board)
-                        if isValidMove:
-                            print("Move valid, moving token" + direction)
-                            break
-                        else:
-                            print("Please select another move.")
-                    except Exception as e:
-                        print(
-                            "Illegal input, please enter one of the following:\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT")
-
-                # TODO: Add the coordinates and token inside the list.
-                move(player2, player2.shape, attemptMove, selectedToken)
-                removeFromBoard(board, selectedToken.coordinates.x, selectedToken.coordinates.y)
-                addToBoard(board, attemptMove.coordinates.x, attemptMove.coordinates.y, player2.shape)
-                break
-
-            else:
-                print("Please select either MOVE or PLACE")
-
-                # Player2 finish his turn
+            # Player2 finish his turn
         printBoard(board)
 
-        # Check player1 win or not
+        # Check player2 win or not
         if currentCounter >= 4:
             if Methods.doIWin(player2, player1):
-                print("\n%s, Congratulations!!! You win the game.\n" % player1Name)
+                print("\n%s, Congratulations!!! You win the game.\n" % player2Name)
                 exit(0)
-
-        player2Choice = ""
 
         # After each turn, and counter will minus 1
         totalCounter = totalCounter - 1
         currentCounter = currentCounter + 1
+    ###################################---Round End---#########################################################
+
 
     print("%s and %s. Thank you for playing X-Rudder Game, and there's no winner between yours.\n" % (
-        player1Name, player2Name))
+    player1Name, player2Name))
 
 
 # For sprint 2
