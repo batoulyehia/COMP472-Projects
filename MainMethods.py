@@ -93,7 +93,14 @@ def evaluateMove(token, userInput, player, board):
         print(y)
 
         if (isTheCellOccupied(board, x, y)) or (x < 0) or (x > 9) or (y < 0) or (y > 11):
-            print("Please select another move.")
+            print("Space is occupied. Please select another move.")
+            userInput = input(
+                "\n%s, Which way do you want to move?\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT"
+            )
+            # reset values of x and y
+            x = token.coordinates.x
+            y = token.coordinates.y
+
         else:
             isValid = True
             return Token(token.owner, token.shape, x, y)
@@ -192,7 +199,7 @@ def startTwoPlayerGame():
                         x = convertedInputCoordinate.x
                         y = convertedInputCoordinate.y
                         # check if the cell is not occupied and that the token doesn't belong to the other player
-                        if (not isTheCellOccupied(board, x, y)) or (board[x][y] == player2.shape):
+                        if (board[x][y] == '_') or (board[x][y] == player2.shape):
                             print("Please enter a valid token (one of your tokens)")
 
                         elif (isTheCellOccupied(board, x - 1, y + 1)) and (isTheCellOccupied(board, x, y + 1)) and (
@@ -301,7 +308,7 @@ def startTwoPlayerGame():
                         x = convertedInputCoordinate.x
                         y = convertedInputCoordinate.y
                         # check if the cell is not occupied and that the token doesn't belong to the other player
-                        if (not isTheCellOccupied(board, x, y)) or (board[x][y] == player1.shape):
+                        if (board[x][y] == '_') or (board[x][y] == player1.shape):
                             print("Please enter a valid token (one of your tokens)")
 
                         elif (isTheCellOccupied(board, x - 1, y + 1)) and (isTheCellOccupied(board, x, y + 1)) and (
