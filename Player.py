@@ -51,60 +51,9 @@ class Player(object):
     def removeFromTokenList(self, token):
         self.tokenList.remove(token)
 
-# Li said the inheritance relationship  is wrong, so I comment it out
-
-# class Player1(Player):
-#     # a variable to store num of tokens for each player
-#     tokenP1 = 15
-#     visitedCoordinatesP1 = [Coordinates(0,3), Coordinates(0,0), Coordinates(0,2), Coordinates(2,0), Coordinates(2,2), Coordinates(3,4), Coordinates(4,0)] #It contains the needed coordinates to let the middle coordinates(1,1) win
-#
-#     def __init__(self, owner, shape, x, y):
-#         super().__init__(owner, shape, x, y)
-#         self.owner = owner
-#         self.shape = shape
-#
-#     @classmethod
-#     def constructor(self, token):
-#         self.token = token
-#
-#     @classmethod
-#     def getVisitedCoordinates(self):
-#         return self.visitedCoordinatesP1
-#
-#     def printCoordinates(self):
-#         # super().getCoordinates(self)
-#         print(self.owner + '\'s coordinates is: (' + self.token.coordinates.x + ',' + self.token.coordinates.y +')')
-
-
-# class Player2(Player):
-#     # a variable to store num of tokens for each player
-#     tokenP2 = 15
-#     visitedCoordinatesP2 = []
-#     tokenListP2 = []
-#
-#     def __init__(self, owner, shape, x, y):
-#         super().__init__(owner, shape, x, y)
-#         self.owner = owner
-#         self.shape = shape
-#
-#     def constructor(self, token):
-#         self.token = token
-#
-#     def getVisitedCoordinates(self):
-#         return self.visitedCoordinatesP2
-#
-#     def printCoordinates(self):
-#         # super().getCoordinates(self)
-#         print(self.owner + '\'s coordinates is: (' + self.token.coordinates.x + ',' + self.token.coordinates.y + ')')
-
-
 # # some testing cases
 # p1 = Player('Player1','X', '3', 'A')
-# p2 = Player2('Player2','~', '4', 'B')
 # p1.printCoordinates()
-# p2.printCoordinates()
-#
-
 
 # a = Methods.toRealCoordinates('A2')
 # a.printCoordinate()

@@ -60,16 +60,8 @@ def move(player, shape, newToken, oldToken):
     # Take in the player input, parse the input into coordinates
     oldCoordinates = oldToken.getCoordinates()
     print("oldCoordinates" + str(oldCoordinates))
-    newCoordinates = newToken.getCoordinates()  # remove that token from the list
+    newCoordinates = newToken.getCoordinates() 
     print("newCoordinates" + str(newCoordinates))
-    # player.tokenList.remove(oldToken)      #create new token based on these coordinates
-
-    # getVisitedCoordinatesFromPlayer = player.visitedCoordinates
-    # getVisitedCoordinatesFromPlayer.remove(oldCoordinates) #removes old coordinates
-    # newToken = Token(player, shape, newCoordinates.x, newCoordinates.y) #creates new Token
-    # player.placeToken(newToken) #inserts the token inside of the visited coordinates list
-    # gettokenListFromPlayer = player.tokenList
-    # gettokenListFromPlayer.append(newToken) #places token inside the token list
 
     x1 = oldToken.coordinates.x
     y1 = oldToken.coordinates.y
@@ -236,7 +228,7 @@ def startTwoPlayerGame():
             while True:
                 # try:
                 direction = input(
-                    "\n%s, Which way do you want to move?\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT"
+                    "\n%s, Which way do you want to move?\nLEFT\nRIGHT\nUP\nDOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT\n"
                 )
                 print(direction)
                 # Evaluates the move selected and checks its validity (if the cell is empty, or if it goes out of the board)
@@ -248,10 +240,7 @@ def startTwoPlayerGame():
                     break
                 else:
                     print("Please select another move.")
-            # except Exception as e:
-            #     print("Illegal input, please enter one of the following:\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT")
-            #
-            # TODO: Add the coordinates and token inside the list.
+
             move(player1, player1.shape, attemptMove, selectedToken)
             removeFromBoard(board, selectedToken.coordinates.x, selectedToken.coordinates.y)
             addToBoard(board, attemptMove.coordinates.x, attemptMove.coordinates.y, player1.shape)
