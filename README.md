@@ -8,7 +8,7 @@ How to run it on school computer labs:
 4. For Player VS AI mode, press 2. 
 
 Team Members: 
-Batoul Yehia - 40010912
-Sajeel Shabir - 40004271
-Jiawei Xia - 40011665
-Li Sun - 40017648
+1. Batoul Yehia - 40010912 
+2. Sajeel Shabir - 40004271 
+3. Jiawei Xia - 40011665 
+4. Li Sun - 40017648 
