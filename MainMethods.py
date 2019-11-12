@@ -1,5 +1,8 @@
+import sys
+
 from Player import *
 import string
+import time
 
 
 # Get token coordinates from user input
@@ -60,16 +63,8 @@ def move(player, shape, newToken, oldToken):
     # Take in the player input, parse the input into coordinates
     oldCoordinates = oldToken.getCoordinates()
     print("oldCoordinates" + str(oldCoordinates))
-    newCoordinates = newToken.getCoordinates()  # remove that token from the list
+    newCoordinates = newToken.getCoordinates()
     print("newCoordinates" + str(newCoordinates))
-    # player.tokenList.remove(oldToken)      #create new token based on these coordinates
-
-    # getVisitedCoordinatesFromPlayer = player.visitedCoordinates
-    # getVisitedCoordinatesFromPlayer.remove(oldCoordinates) #removes old coordinates
-    # newToken = Token(player, shape, newCoordinates.x, newCoordinates.y) #creates new Token
-    # player.placeToken(newToken) #inserts the token inside of the visited coordinates list
-    # gettokenListFromPlayer = player.tokenList
-    # gettokenListFromPlayer.append(newToken) #places token inside the token list
 
     x1 = oldToken.coordinates.x
     y1 = oldToken.coordinates.y
@@ -236,7 +231,7 @@ def startTwoPlayerGame():
             while True:
                 # try:
                 direction = input(
-                    "\n%s, Which way do you want to move?\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT"
+                    "\n%s, Which way do you want to move?\nLEFT\nRIGHT\nUP\nDOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT\n"
                 )
                 print(direction)
                 # Evaluates the move selected and checks its validity (if the cell is empty, or if it goes out of the board)
@@ -248,10 +243,7 @@ def startTwoPlayerGame():
                     break
                 else:
                     print("Please select another move.")
-            # except Exception as e:
-            #     print("Illegal input, please enter one of the following:\nLEFT\nRIGHT\nUP\n\DOWN\nUP-LEFT\nUP-RIGHT\nDOWN-LEFT\nDOWN-RIGHT")
-            #
-            # TODO: Add the coordinates and token inside the list.
+
             move(player1, player1.shape, attemptMove, selectedToken)
             removeFromBoard(board, selectedToken.coordinates.x, selectedToken.coordinates.y)
             addToBoard(board, attemptMove.coordinates.x, attemptMove.coordinates.y, player1.shape)
@@ -359,19 +351,237 @@ def startTwoPlayerGame():
         currentCounter = currentCounter + 1
     ###################################---Round End---#########################################################
 
-
     print("%s and %s. Thank you for playing X-Rudder Game, and there's no winner between yours.\n" % (
-    player1Name, player2Name))
+        player1Name, player2Name))
 
 
 # For sprint 2
 def startFightWithAIGameModel():
     print("Let's start fight with AI game model\n")
 
-# For testing
-# alphabet = list(string.ascii_uppercase[0:12])
-# board = [['_' for i in range(12)] for j in range(10)]
-# for cell in alphabet:
-#     print(cell, end=" ")
-# print()
-# printBoard(board)
+    board = [['_' for i in range(12)] for j in range(10)]
+    print("Let's start two player game model\n")
+
+    # Player1 setting
+    player1Name = input("Player1\nPlease enter your name:\n")
+    while not player1Name:
+        player1Name = input("Invalid entry\nPlayer1\nPlease enter your name:\n")
+    # Player1 default setting is X
+    player1 = Player(player1Name, "X")
+
+    # Player2 setting
+    # Player2 default setting is O
+    player2Name = "Computer"
+    player2 = Player(player2Name, "O")
+    print("Thank you, and let's start the game.\nThis is our initial empty board\n")
+
+    ##############game start##################
+    # Create a counter for maximum 30 turns
+    totalCounter = 30
+    currentCounter = 0
+    # print current board
+    printBoard(board)
+    # initialize the coordinates
+    x = 0
+    y = 0
+    while totalCounter > 0:
+        print("\nRound " + str(currentCounter + 1))  # Print the current round
+
+        # Player1 start to play
+        x, y = getTokenCoordinates(board, player1Name)
+        # Create token
+        token = Token(player1Name, player1.shape, x, y)
+        # Place token and add to visited token list
+        player1.placeToken(token)
+        player1.addTokenToList(token)
+        addToBoard(board, x, y, token.shape)
+        # Player1 finish his turn
+        printBoard(board)
+
+        # Check player1 win or not
+        if currentCounter >= 4:  # The 5th rounds
+            if Methods.doIWin(player1, player2):
+                print("\n%s, Congratulations!!! You win the game.\n" % player1Name)
+                exit(0)
+
+        # Print my tokenList
+        for i in player1.tokenList:
+            print(i.owner + ", You have placed token at X: " + str(i.coordinates.x) + " Y: " + str(
+                i.coordinates.y) + "\n")
+
+        ###########==================Player2==============########################
+        # Player2 start to play
+        # x, y = getTokenCoordinates(board, player2Name)
+        alpha = -2
+        beta = 2
+        print('Computer is searching for a place...')
+        start = time.time()
+        (m, x, y, found, valueSet) = maximize(board, player1, player2, player2Name, player1Name, alpha, beta)
+        end = time.time()
+        print('Evaluation time: {}s'.format(round(end - start, 7)))
+        print(player2Name + ", placed token at X: " + str(x) + " Y: " + str(y) + "\n")
+        # Create token
+        token = Token(player2Name, player2.shape, x, y)
+        # Place token and add to visited token list
+        player2.placeToken(token)
+        player2.addTokenToList(token)
+        addToBoard(board, x, y, token.shape)
+        # Player2 finish his turn
+        printBoard(board)
+
+        # Check player2 win or not
+        if currentCounter >= 4:
+            if Methods.doIWin(player2, player1):
+                print("\n%s, Congratulations!!! You win the game.\n" % player2Name)
+                exit(0)
+
+        # After each turn, and counter will minus 1
+        totalCounter = totalCounter - 1
+        currentCounter = currentCounter + 1
+        ###################################---Round End---#########################################################
+
+    print("%s and %s. Thank you for playing X-Rudder Game, and there's no winner between yours.\n" % (
+        player1Name, player2Name))
+
+
+# reference https://stackabuse.com/minimax-and-alpha-beta-pruning-in-python/
+# Player 'O' is max, in this case AI
+def maximize(board, player1, player2, player2Name, player1Name, alpha, beta):
+    maxv = -2
+    px = None
+    py = None
+
+    maxWon = Methods.doIWin(player2, player1)
+    minWon = Methods.doIWin(player1, player2)
+
+    # variable to check if win for Ai(in this case max is ai) is found
+    isfound = False
+    # variable to check if x, y value is set the move which generated a win
+    isvalueSet = False
+
+    # if win for max is found
+    if maxWon:
+        isfound = True
+        return (1, 0, 0, isfound, isvalueSet)
+
+    if minWon:
+        isfound = False
+        return (-1, 0, 0, isfound, isvalueSet)
+
+    for i in range(0, 10):
+        # check if a filed on board is empty is so then place a token for the player
+        for j in range(0, 12):
+            if board[i][j] == '_':
+                # On the empty field player 'O' makes a move and calls Min
+                # That's one branch of the game tree.
+                # placing a temporary token for the player to generate a board to check for moves
+                token = Token(player2Name, player2.shape, i, j)
+                # Place token and add to visited token list
+                player2.placeToken(token)
+                player2.addTokenToList(token)
+                addToBoard(board, i, j, token.shape)
+                # printBoard(board)
+                (m, min_i, min_j, found, valueSet) = maximize(board, player1, player2, player2Name, player1Name, alpha,
+                                                              beta)
+                isfound = found
+                isvalueSet = valueSet
+
+                if m > maxv:
+                    maxv = m
+                    px = i
+                    py = j
+                # Setting back the field to empty
+                # removing the temporary token that was added to board to bring board to initial configuration
+                player2.removeTokenCoordinates(token)
+                player2.removeFromTokenList(token)
+                board[i][j] = '_'
+                # printBoard(board)
+
+                if maxv >= beta:
+                    return (maxv, px, py, isfound, isvalueSet)
+
+                if maxv > alpha:
+                    alpha = maxv
+
+                    # checking if win was found but the value is not yet set - setting value and returning x,y for winning move
+                if isfound and not isvalueSet:
+                    px = i
+                    py = j
+                    isvalueSet = True
+                    # print(str(i) + " MAX " + str(j))
+                    return (maxv, px, py, isfound, isvalueSet)
+
+                    # if the value x, y is already set then return that same value which generated win from function call
+                if valueSet:
+                    return (m, min_i, min_j, isfound, isvalueSet)
+
+    return (maxv, px, py, isfound, isvalueSet)
+
+
+# Player 'X' is min, in this case human
+def minimize(board, player1, player2, player2Name, player1Name, alpha, beta):
+    minv = 2
+    qx = None
+    qy = None
+
+    maxWon = Methods.doIWin(player2, player1)
+    minWon = Methods.doIWin(player1, player2)
+    # variable to check if win for Ai(in this case max is ai) is found
+    isfound = False
+    # variable to check if x, y value is set the move which generated a win
+    isvalueSet = False
+
+    # if win for max is found
+    if maxWon:
+        isfound = True
+        return (1, 0, 0, isfound, isvalueSet)
+
+    if minWon:
+        isfound = False
+        return (-1, 0, 0, isfound, isvalueSet)
+
+    for i in range(0, 10):
+        # check if a filed on board is empty is so then place a token for the player
+        for j in range(0, 12):
+            # check if a filed on board is empty is so then place a token for the player
+            if board[i][j] == '_':
+                # placing a temporary token for the player to generate a board to check for moves
+                token = Token(player1Name, player1.shape, i, j)
+                # Place token and add to visited token list
+                player1.placeToken(token)
+                player1.addTokenToList(token)
+                addToBoard(board, i, j, token.shape)
+                # printBoard(board)
+                (m, max_i, max_j, found, valueSet) = maximize(board, player1, player2, player2Name, player1Name, alpha,
+                                                              beta)
+                isfound = found
+                isvalueSet = valueSet
+
+                if m < minv:
+                    minv = m
+                    qx = i
+                    qy = j
+                # removing the temporary token that was added to board to bring board to initial configuration
+                player1.removeTokenCoordinates(token)
+                player1.removeFromTokenList(token)
+                board[i][j] = '_'
+
+                if minv <= alpha:
+                    return (minv, qx, qy, isfound, isvalueSet)
+
+                if minv < beta:
+                    beta = minv
+
+                    # checking if win was found but the value is not yet set - setting value and returning x,y for winning move
+                if isfound and not isvalueSet:
+                    qx = i
+                    qy = j
+                    isvalueSet = True
+                    # print(str(i) + " MIN " + str(j))
+                    return (minv, qx, qy, isfound, isvalueSet)
+
+                    # if the value x, y is already set then return that same value which generated win from function call
+                if isvalueSet:
+                    return (m, max_i, max_j, isfound, isvalueSet)
+
+    return (minv, qx, qy, isfound, isvalueSet)
