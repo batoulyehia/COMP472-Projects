@@ -395,6 +395,7 @@ def startFightWithAIGameModel():
         player1.placeToken(token)
         player1.addTokenToList(token)
         addToBoard(board, x, y, token.shape)
+        print(player1Name + ", placed token at X: " + str(x) + " Y: " + str(y) + "\n")
         # Player1 finish his turn
         printBoard(board)
 
@@ -405,20 +406,22 @@ def startFightWithAIGameModel():
                 exit(0)
 
         # Print my tokenList
-        for i in player1.tokenList:
-            print(i.owner + ", You have placed token at X: " + str(i.coordinates.x) + " Y: " + str(
-                i.coordinates.y) + "\n")
+        # for i in player1.tokenList:
+        #     print(i.owner + ", You have placed token at X: " + str(i.coordinates.x) + " Y: " + str(
+        #         i.coordinates.y) + "\n")
 
         ###########==================Player2==============########################
         # Player2 start to play
         # x, y = getTokenCoordinates(board, player2Name)
         alpha = -2
         beta = 2
+        depth = 0
         print('Computer is searching for a place...')
         start = time.time()
-        (m, x, y, found, valueSet) = maximize(board, player1, player2, player2Name, player1Name, alpha, beta)
+        (m, x, y, found, valueSet) = maximize(board, player1, player2, player2Name, player1Name, alpha, beta, depth)
         end = time.time()
         print('Evaluation time: {}s'.format(round(end - start, 7)))
+        print("Heuristic value of node:" + str(m))
         print(player2Name + ", placed token at X: " + str(x) + " Y: " + str(y) + "\n")
         # Create token
         token = Token(player2Name, player2.shape, x, y)
@@ -446,10 +449,12 @@ def startFightWithAIGameModel():
 
 # reference https://stackabuse.com/minimax-and-alpha-beta-pruning-in-python/
 # Player 'O' is max, in this case AI
-def maximize(board, player1, player2, player2Name, player1Name, alpha, beta):
+def maximize(board, player1, player2, player2Name, player1Name, alpha, beta, depth):
     maxv = -2
     px = None
     py = None
+    depth = depth + 1
+    # print(depth)
 
     maxWon = Methods.doIWin(player2, player1)
     minWon = Methods.doIWin(player1, player2)
@@ -461,12 +466,19 @@ def maximize(board, player1, player2, player2Name, player1Name, alpha, beta):
 
     # if win for max is found
     if maxWon:
+        # print("max - max won")
         isfound = True
-        return (1, 0, 0, isfound, isvalueSet)
+        heuristicValue = depth
+        return (heuristicValue, 0, 0, isfound, isvalueSet)
 
     if minWon:
         isfound = False
-        return (-1, 0, 0, isfound, isvalueSet)
+        heuristicValue = -1
+        return (heuristicValue, 0, 0, isfound, isvalueSet)
+
+    if depth == 27:
+        heuristicValue = 1
+        return (heuristicValue, 0, 0, isfound, isvalueSet)
 
     for i in range(0, 10):
         # check if a filed on board is empty is so then place a token for the player
@@ -480,16 +492,20 @@ def maximize(board, player1, player2, player2Name, player1Name, alpha, beta):
                 player2.placeToken(token)
                 player2.addTokenToList(token)
                 addToBoard(board, i, j, token.shape)
+                # print("maximize: " + player2.shape)
                 # printBoard(board)
-                (m, min_i, min_j, found, valueSet) = maximize(board, player1, player2, player2Name, player1Name, alpha,
-                                                              beta)
+                (m, min_i, min_j, found, valueSet) = minimize(board, player1, player2, player2Name, player1Name, alpha,
+                                                              beta, depth)
+                depth = m
                 isfound = found
                 isvalueSet = valueSet
 
-                if m > maxv:
+                if m > maxv and not isvalueSet:
+                    # print("in m > max-> m: " + str(m) + " maxv: " + str(maxv))
                     maxv = m
                     px = i
                     py = j
+                    # print("in m > max-> m: " + str(m) + " maxv: " + str(maxv) + " i: " + str(i) + " j: " + str(j))
                 # Setting back the field to empty
                 # removing the temporary token that was added to board to bring board to initial configuration
                 player2.removeTokenCoordinates(token)
@@ -498,6 +514,7 @@ def maximize(board, player1, player2, player2Name, player1Name, alpha, beta):
                 # printBoard(board)
 
                 if maxv >= beta:
+                    # print("in  maxv >= beta: ->  maxv: " + str(maxv) + " i: " + str(px) + " j: " + str(py))
                     return (maxv, px, py, isfound, isvalueSet)
 
                 if maxv > alpha:
@@ -519,10 +536,12 @@ def maximize(board, player1, player2, player2Name, player1Name, alpha, beta):
 
 
 # Player 'X' is min, in this case human
-def minimize(board, player1, player2, player2Name, player1Name, alpha, beta):
+def minimize(board, player1, player2, player2Name, player1Name, alpha, beta, depth):
     minv = 2
     qx = None
     qy = None
+    depth = depth + 1
+    # print(depth)
 
     maxWon = Methods.doIWin(player2, player1)
     minWon = Methods.doIWin(player1, player2)
@@ -533,12 +552,19 @@ def minimize(board, player1, player2, player2Name, player1Name, alpha, beta):
 
     # if win for max is found
     if maxWon:
+        # print("min - max won")
         isfound = True
-        return (1, 0, 0, isfound, isvalueSet)
+        heuristicValue = depth
+        return (heuristicValue, 0, 0, isfound, isvalueSet)
 
     if minWon:
         isfound = False
-        return (-1, 0, 0, isfound, isvalueSet)
+        heuristicValue = -1
+        return (heuristicValue, 0, 0, isfound, isvalueSet)
+
+    if depth == 27:
+        heuristicValue = 1
+        return (heuristicValue, 0, 0, isfound, isvalueSet)
 
     for i in range(0, 10):
         # check if a filed on board is empty is so then place a token for the player
@@ -551,9 +577,11 @@ def minimize(board, player1, player2, player2Name, player1Name, alpha, beta):
                 player1.placeToken(token)
                 player1.addTokenToList(token)
                 addToBoard(board, i, j, token.shape)
+                # print("minimize: " + player1.shape)
                 # printBoard(board)
                 (m, max_i, max_j, found, valueSet) = maximize(board, player1, player2, player2Name, player1Name, alpha,
-                                                              beta)
+                                                              beta, depth)
+                depth = m
                 isfound = found
                 isvalueSet = valueSet
 
@@ -567,6 +595,7 @@ def minimize(board, player1, player2, player2Name, player1Name, alpha, beta):
                 board[i][j] = '_'
 
                 if minv <= alpha:
+                    # print("in  minv <= alpha:: ->  minv: " + str(minv) + " i: " + str(qx) + " j: " + str(qy))
                     return (minv, qx, qy, isfound, isvalueSet)
 
                 if minv < beta:
@@ -574,11 +603,9 @@ def minimize(board, player1, player2, player2Name, player1Name, alpha, beta):
 
                     # checking if win was found but the value is not yet set - setting value and returning x,y for winning move
                 if isfound and not isvalueSet:
-                    qx = i
-                    qy = j
                     isvalueSet = True
                     # print(str(i) + " MIN " + str(j))
-                    return (minv, qx, qy, isfound, isvalueSet)
+                    return (m, max_i, max_j, isfound, isvalueSet)
 
                     # if the value x, y is already set then return that same value which generated win from function call
                 if isvalueSet:
