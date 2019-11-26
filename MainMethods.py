@@ -387,29 +387,7 @@ def startFightWithAIGameModel():
     while totalCounter > 0:
         print("\nRound " + str(currentCounter + 1))  # Print the current round
 
-        # Player1 start to play
-        x, y = getTokenCoordinates(board, player1Name)
-        # Create token
-        token = Token(player1Name, player1.shape, x, y)
-        # Place token and add to visited token list
-        player1.placeToken(token)
-        player1.addTokenToList(token)
-        addToBoard(board, x, y, token.shape)
-        # Player1 finish his turn
-        printBoard(board)
-
-        # Check player1 win or not
-        if currentCounter >= 4:  # The 5th rounds
-            if Methods.doIWin(player1, player2):
-                print("\n%s, Congratulations!!! You win the game.\n" % player1Name)
-                exit(0)
-
-        # Print my tokenList
-        for i in player1.tokenList:
-            print(i.owner + ", You have placed token at X: " + str(i.coordinates.x) + " Y: " + str(
-                i.coordinates.y) + "\n")
-
-        ###########==================Player2==============########################
+        ###########==================AI Turn==============########################
         # Player2 start to play
         # x, y = getTokenCoordinates(board, player2Name)
         alpha = -2
@@ -434,6 +412,28 @@ def startFightWithAIGameModel():
             if Methods.doIWin(player2, player1):
                 print("\n%s, Congratulations!!! You win the game.\n" % player2Name)
                 exit(0)
+
+        # Other AI or Human (Player1) start to play
+        x, y = getTokenCoordinates(board, player1Name)
+        # Create token
+        token = Token(player1Name, player1.shape, x, y)
+        # Place token and add to visited token list
+        player1.placeToken(token)
+        player1.addTokenToList(token)
+        addToBoard(board, x, y, token.shape)
+        # Player1 finish his turn
+        printBoard(board)
+
+        # Check player1 win or not
+        if currentCounter >= 4:  # The 5th rounds
+            if Methods.doIWin(player1, player2):
+                print("\n%s, Congratulations!!! You win the game.\n" % player1Name)
+                exit(0)
+
+        # Print my tokenList
+        for i in player1.tokenList:
+            print(i.owner + ", You have placed token at X: " + str(i.coordinates.x) + " Y: " + str(
+                i.coordinates.y) + "\n")
 
         # After each turn, and counter will minus 1
         totalCounter = totalCounter - 1
