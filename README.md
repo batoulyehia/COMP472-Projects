@@ -1,6 +1,6 @@
-# COMP472-Project1
+# COMP472-Projects
 
-How to run it on school computer labs: 
+## How to run Project 1 on school computer labs:
 
 1. Open the folder in VSCode. 
 2. Open a terminal and run the command `python Main.py`
